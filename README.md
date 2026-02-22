@@ -1,70 +1,64 @@
 # llm-meter
 
-A clean terminal dashboard for online LLM token and cost monitoring.
+Terminal-first LLM usage and cost monitor with a live TUI, provider connection testing, and local snapshot storage.
 
-## Features (MVP)
-- Rust + Ratatui TUI
-- Online usage polling
-- OpenAI + Anthropic adapters
-- Provider-agnostic adapter trait for incremental "any model" support
-- OS keychain API key storage
-- SQLite snapshots
-- JSON/CSV export
+## What it does
+- Polls provider usage APIs (OpenAI, Anthropic)
+- Calculates cost from pricing rules
+- Stores snapshots in SQLite
+- Shows dashboard + provider management in a Ratatui interface
+- Exports cost data as JSON or CSV
 
-## Install prerequisites
-- Rust toolchain (`rustup`)
+## Prerequisites
+- Rust toolchain (`rustup`, `cargo`)
 
-## Build
+## Quick Start
+From repository root:
+
 ```bash
-cd tools/llm-meter
-cargo build
-```
-
-## Quick start
-```bash
-cd tools/llm-meter
 cargo run -- init
 cargo run -- add-provider openai --api-key "$OPENAI_API_KEY"
-cargo run -- add-provider anthropic --api-key "$ANTHROPIC_API_KEY"
 cargo run -- tui
 ```
 
-## Configuration paths
-- Default: OS app data/config directories.
-- Override with `LLM_METER_HOME=/path/to/dir` (useful for CI/sandboxes).
-- If OS path is not writable, it falls back to local `.llm-meter/`.
+Optional helper script:
 
-## API key resolution order
-1. OS keychain
-2. Environment variable (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.)
+```bash
+./scripts/run-app.sh
+```
 
-## Commands
-- `llm-meter init`
-- `llm-meter add-provider <provider> --api-key <key> [--base-url <url>] [--organization-id <id>]`
-- `llm-meter refresh --window 1d|7d|30d`
-- `llm-meter export --format json|csv`
-- `llm-meter tui`
+## Core Commands
+```bash
+cargo run -- init
+cargo run -- add-provider <provider> --api-key <key> [--base-url <url>] [--organization-id <id>]
+cargo run -- refresh --window 1d|7d|30d
+cargo run -- export --format json|csv
+cargo run -- tui
+```
 
-## Keybindings
-- `a` focus visible actions panel
-- `r` refresh now
-- `1` one-day window
-- `7` seven-day window
-- `3` thirty-day window
-- `q` open quit confirmation
-- `z` toggle compact mode
-- `Tab` and `Shift+Tab` navigate form fields
-- `Esc` close modal/back
-- `Up`/`Down` + `Enter` run focused action
+## Configuration and Secrets
+- `LLM_METER_HOME` overrides app home (useful in CI or smoke runs).
+- Default home uses OS app dirs; fallback is local `.llm-meter/` if needed.
+- API key lookup order:
+1. OS keychain entry (`llm-meter` service)
+2. Env var (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.)
 
-## In-TUI provider management
-- Open Actions (`a`) and select `Manage providers/keys`
-- `n` add provider
-- `Enter` edit selected provider
-- `t` enable/disable selected provider
-- `k` delete selected provider key
-- `d` remove provider and key
+## TUI Highlights
+- Dashboard: `r` refresh, `1/7/3` window, `a` focus actions, `q` quit prompt
+- Provider manager: `n` add, `Enter` edit, `t` test, `e` enable/disable, `k` delete key, `d` remove provider
+- Provider form: `t` test connection, `x` clear test logs, `v` advanced fields, `i` error details
 
-## Notes
-- Provider usage API schemas can change; adapter parsing intentionally tolerates missing fields.
-- Built-in pricing defaults are in `src/pricing.rs` and can be overridden in config.
+## Local Validation
+```bash
+./scripts/test-local.sh
+```
+This runs format check, clippy, tests, build, and a smoke run.
+
+## Documentation
+- `docs/README.md` (index)
+- `docs/cli.md`
+- `docs/tui.md`
+- `docs/configuration.md`
+- `docs/architecture.md`
+- `docs/development.md`
+- `docs/troubleshooting.md`
