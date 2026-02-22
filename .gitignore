@@ -1,0 +1,15 @@
+# Rust build outputs
+/target/
+
+# Local app state
+/.llm-meter/
+
+# Environment/local secrets files
+.env
+.env.*
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
